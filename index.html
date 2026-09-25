@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traditional Knowledge for Disaster Management</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0b192c;
+            --text-main: #e2e8f0;
+            --accent-gold: #fbc02d;
+            --accent-jade: #00bfa5;
+            --panel-bg: rgba(255, 255, 255, 0.05);
+            --font-body: 'Poppins', sans-serif;
+            --font-heading: 'Cinzel', serif;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        a {
+            color: var(--accent-jade);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--accent-jade);
+            transition: color 0.3s;
+        }
+        a:hover {
+            color: var(--accent-gold);
+            border-bottom: 1px solid var(--accent-gold);
+        }
+        /* Scroll Progress */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-jade), var(--accent-gold));
+            width: 0%;
+            z-index: 1000;
+        }
+        /* Floating Nav */
+        .floating-nav {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+        }
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .nav-dot:hover, .nav-dot.active {
+            background: var(--accent-gold);
+            transform: scale(1.3);
+        }
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-family: var(--font-heading);
+            color: var(--accent-gold);
+        }
+        h2 { font-size: 2.8rem; margin-bottom: 1.5rem; text-align: left; border-bottom: 2px solid var(--panel-bg); padding-bottom: 10px; }
+        h3 { font-size: 1.8rem; margin-bottom: 1rem; margin-top: 2rem; color: var(--accent-jade); }
+        
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 6rem 2rem;
+            position: relative;
+        }
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        /* Intro Section */
+        #intro {
+            background: radial-gradient(circle at center, #153250 0%, #0b192c 100%);
+            overflow: hidden;
+        }
+        .water-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0.1;
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, #00bfa5 20px, #00bfa5 40px);
+            animation: moveWater 20s linear infinite;
+        }
+        @keyframes moveWater { 100% { background-position: 0 1000px; } }
+        .title-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+        .intro-title {
+            font-size: 4rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            text-transform: uppercase;
+        }
+        .intro-title .word { display: inline-flex; overflow: hidden; }
+        .intro-title .char { display: inline-block; }
+        .intro-subtitle {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            color: var(--accent-jade);
+            opacity: 0;
+        }
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            opacity: 0;
+        }
+        .arrow-down {
+            margin-top: 10px;
+            width: 20px;
+            height: 20px;
+            border-right: 3px solid var(--accent-gold);
+            border-bottom: 3px solid var(--accent-gold);
+            transform: rotate(45deg);
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0) rotate(45deg);} 40% {transform: translateY(-15px) rotate(45deg);} 60% {transform: translateY(-7px) rotate(45deg);} }
+        .dragon-boat-icon {
+            position: absolute;
+            bottom: 150px;
+            left: -100px;
+            font-size: 3rem;
+            opacity: 0;
+        }
+
+        /* Content Text Columns */
+        .text-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        /* Card Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 3rem;
+        }
+        .card {
+            background: var(--panel-bg);
+            padding: 30px;
+            border-radius: 12px;
+            border-top: 4px solid var(--accent-jade);
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 25px rgba(0,191,165,0.2);
+        }
+        .card-desc { margin-top: 15px; font-size: 1rem; color: #ccc; }
+
+        /* Simulations */
+        .simulation-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        .simulation-box {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--accent-jade);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+        }
+        input[type=range] {
+            width: 80%;
+            margin: 20px 0;
+            accent-color: var(--accent-jade);
+        }
+        .stilt-demo {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 180px;
+            position: relative;
+            margin-top: 20px;
+            overflow: hidden;
+            border-bottom: 2px solid #555;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+        }
+        .water-level {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%;
+            background: rgba(0, 191, 165, 0.5);
+            height: 10px;
+            transition: height 0.3s;
+        }
+        .house { width: 60px; height: 50px; background: #8d6e63; position: relative; z-index: 2; transition: all 0.3s; border-radius: 4px 4px 0 0; }
+        .house.stilt { margin-bottom: 50px; }
+        .house.stilt::before, .house.stilt::after {
+            content: ''; position: absolute; width: 6px; height: 50px; background: #5d4037; bottom: -50px;
+        }
+        .house.stilt::before { left: 10px; }
+        .house.stilt::after { right: 10px; }
+        .flooded-label { color: #ff5252; font-weight: bold; opacity: 0; position: absolute; top: -30px; left: 0; width: 100%; text-align: center; }
+
+        /* Floating Garden Demo */
+        .garden-demo {
+            height: 120px; position: relative; margin-top: 20px; background: rgba(0,0,0,0.5); border-radius: 8px; overflow: hidden;
+        }
+        .garden-water { height: 30px; width:100%; background: rgba(0, 191, 165, 0.5); position: absolute; bottom: 0; transition: height 0.5s; }
+        .raft { width: 120px; height: 25px; background: #4caf50; position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); transition: bottom 0.5s; border-radius: 10px; box-shadow: inset 0 -5px 0 rgba(0,0,0,0.2); }
+        
+        /* Hexagon Wheel */
+        .hex-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin: 3rem 0;
+        }
+        .hex {
+            width: 180px; height: 120px;
+            background: var(--panel-bg);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 15px;
+            font-weight: 600;
+        }
+        .hex:hover, .hex.active { background: var(--accent-jade); color: #000; transform: scale(1.1); box-shadow: 0 0 20px rgba(0, 191, 165, 0.5); }
+        .hex-detail { margin-top: 30px; padding: 30px; background: rgba(0,0,0,0.5); border-left: 5px solid var(--accent-jade); display: none; font-size: 1.1rem; line-height: 1.8; }
+
+        /* Teamwork Compare */
+        .compare-panel { display: flex; gap: 30px; margin-top: 30px; }
+        .compare-box { flex: 1; padding: 30px; background: var(--panel-bg); border-radius: 12px; text-align: center; }
+        .team-icon { font-size: 4rem; margin-bottom: 15px; }
+
+        /* Conclusion Flow */
+        .flow-chain {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 3rem;
+        }
+        .flow-item {
+            background: var(--panel-bg);
+            padding: 15px 25px;
+            border-radius: 30px;
+            border: 2px solid var(--accent-gold);
+            opacity: 0;
+            transform: translateX(-30px);
+            font-weight: 600;
+        }
+        .flow-arrow { color: var(--accent-jade); opacity: 0; font-size: 1.5rem; }
+
+        /* Information Panels for more content */
+        .info-panel {
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 20px;
+            border-left: 4px solid var(--accent-gold);
+        }
+
+        /* Reveal classes */
+        .reveal { opacity: 0; transform: translateY(50px); }
+
+        @media (max-width: 900px) {
+            .text-columns { grid-template-columns: 1fr; }
+            .simulation-container { grid-template-columns: 1fr; }
+            .compare-panel { flex-direction: column; }
+        }
+        @media (max-width: 768px) {
+            .intro-title { font-size: 2.5rem; }
+            .floating-nav { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="progress-bar"></div>
+
+    <div class="floating-nav">
+        <div class="nav-dot" data-target="#intro" title="Intro"></div>
+        <div class="nav-dot" data-target="#section-1" title="Introduction"></div>
+        <div class="nav-dot" data-target="#section-2" title="Traditional Knowledge"></div>
+        <div class="nav-dot" data-target="#section-3" title="Disaster Management"></div>
+        <div class="nav-dot" data-target="#section-4" title="Chinese Case Study"></div>
+        <div class="nav-dot" data-target="#section-5" title="Lessons for DRR"></div>
+        <div class="nav-dot" data-target="#section-6" title="Conclusion"></div>
+    </div>
+
+    <!-- INTRO -->
+    <section id="intro">
+        <div class="water-bg"></div>
+        <div class="title-container">
+            <h1 class="intro-title">
+                <span>Traditional</span> <span>Knowledge</span> <span>for</span> <span>Disaster</span> <span>Management</span>
+            </h1>
+            <p class="intro-subtitle">The Dragon Boat Festival Case Study</p>
+        </div>
+        <div class="dragon-boat-icon">🛶</div>
+        <div class="scroll-indicator">
+            <p>Scroll to explore</p>
+            <div class="arrow-down"></div>
+        </div>
+    </section>
+
+    <!-- SECTION 1 -->
+    <section id="section-1">
+        <div class="container reveal">
+            <h2 style="font-size: 8rem; opacity: 0.1; position: absolute; top: -20px; left: -20px; z-index: -1;">01</h2>
+            <h2>Introduction</h2>
+            <div class="text-columns">
+                <div>
+                    <p>The Dragon Boat Festival, or <em>Duanwu</em>, stands as a fundamental cornerstone of Chinese cultural heritage. <a href="https://ich.unesco.org/en/RL/dragon-boat-festival-the-miao-ethnic-group-00225" target="_blank">Recognized by UNESCO</a> as an Intangible Cultural Heritage of Humanity, it is intimately connected with rivers, seasonal shifts, water-based activities, and profound traditions passed down through countless generations.</p>
+                    <br>
+                    <p>While the festival itself is a vibrant celebration, our focus extends deeply into the mechanisms behind these practices. We explore how indigenous and traditional knowledge systems, a heightened sense of environmental awareness, and cohesive community participation serve as powerful, enduring tools for disaster management and community resilience.</p>
+                </div>
+                <div>
+                    <div class="info-panel">
+                        <h4 style="color:var(--accent-jade)">A Global Context</h4>
+                        <p>Globally, traditional knowledge is increasingly being integrated into formal frameworks like the <a href="https://www.undrr.org/implementing-sendai-framework/what-sendai-framework" target="_blank">Sendai Framework for Disaster Risk Reduction (UNDRR)</a>. Studies have shown that communities leveraging their ancestral knowledge suffer fewer casualties and experience faster economic recoveries during natural hazards compared to those relying solely on external technological interventions.</p>
+                    </div>
+                    <div style="margin-top: 30px; display: inline-block; padding: 12px 25px; border: 2px solid var(--accent-jade); border-radius: 30px; color: var(--accent-jade); font-weight: bold; background: rgba(0,191,165,0.1);">
+                        📅 Celebrated on the 5th day, 5th month of the Chinese lunar calendar
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2 -->
+    <section id="section-2">
+        <div class="container reveal">
+            <h2 style="font-size: 8rem; opacity: 0.1; position: absolute; top: -20px; left: -20px; z-index: -1;">02</h2>
+            <h2>Dragon Boat Festival & Traditional Knowledge</h2>
+            <p>Through generations of interaction with their immediate surroundings, communities develop profound, practical knowledge about their local environment, weather patterns, and ecological systems. This knowledge is not static; it evolves and is rigorously tested over centuries. Explore the practices below to understand how cultural traditions embed critical environmental knowledge.</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>🛶 Dragon Boat Racing</h3>
+                    <p class="card-desc">Beyond sport, racing fosters immense physical endurance, coordinated teamwork, and a deep familiarity with local waterways, currents, and seasonal water level changes. This intimacy with the river creates a collective memory of historical flood markers and water behaviors.</p>
+                </div>
+                <div class="card">
+                    <h3>🥁 Traditional Drumming</h3>
+                    <p class="card-desc">The synchronized beating of the drum develops rhythmic coordination and establishes a method for clear, penetrating communication across vast distances and through chaotic environments—a skill highly transferable to crisis management and emergency signaling.</p>
+                </div>
+                <div class="card">
+                    <h3>🍙 Preparing Zongzi</h3>
+                    <p class="card-desc">The preparation of sticky rice dumplings wrapped in bamboo or reed leaves preserves vital knowledge of local agriculture, seasonal harvesting, and ancient food preservation techniques essential for sustaining populations during periods of resource scarcity.</p>
+                </div>
+                <div class="card">
+                    <h3>🌿 Mugwort & Calamus</h3>
+                    <p class="card-desc">Hanging these specific plants at doorways during the hot, humid fifth month represents traditional ecological and medicinal knowledge. It demonstrates an understanding of disease vectors, utilizing the plants' pest-repelling and air-purifying properties during the most disease-prone season.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3 -->
+    <section id="section-3">
+        <div class="container reveal">
+            <h2 style="font-size: 8rem; opacity: 0.1; position: absolute; top: -20px; left: -20px; z-index: -1;">03</h2>
+            <h2>Traditional Knowledge in Disaster Management</h2>
+            <p>Traditional knowledge plays a direct, measurable role in reducing the impact of natural hazards. Local environmental knowledge leads directly to physical adaptation, which reduces structural vulnerability and saves lives. To view the impact of these strategies, explore data on global disaster statistics at the <a href="https://www.emdat.be/" target="_blank">EM-DAT International Disaster Database</a>.</p>
+
+            <div class="simulation-container">
+                <div class="simulation-box">
+                    <h3>Flood Adaptation (Assam, India)</h3>
+                    <p style="font-size:0.9rem; color:#bbb; margin-bottom: 15px;">In flood-prone regions like Assam, traditional architecture utilizes raised platforms (stilts) constructed from local bamboo and timber. This allows floodwaters to pass underneath without destroying the living quarters or contaminating food stores. Drag the slider to simulate rising monsoonal waters.</p>
+                    <input type="range" id="flood-slider" min="10" max="100" value="10">
+                    <div class="stilt-demo">
+                        <div class="water-level" id="stilt-water"></div>
+                        <div style="position:relative; z-index: 10;">
+                            <span class="flooded-label" id="flooded-alert">Flooded! Assets Lost.</span>
+                            <div class="house" id="house-modern"></div>
+                            <p style="font-size: 0.8rem; margin-top:5px; font-weight:bold;">Slab-on-Grade Structure</p>
+                        </div>
+                        <div style="position:relative; z-index: 10;">
+                            <div class="house stilt"></div>
+                            <p style="font-size: 0.8rem; margin-top:5px; font-weight:bold;">Traditional Stilt House</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="simulation-box">
+                    <h3>Floating Gardens (Bangladesh)</h3>
+                    <p style="font-size:0.9rem; color:#bbb; margin-bottom: 15px;">Locally known as <em>Baira</em>, floating agriculture involves weaving water hyacinth and other aquatic plants into buoyant rafts. Soil and seeds are placed on top, allowing crops to rise and fall with floodwaters, ensuring food security even when arable land is entirely submerged for months.</p>
+                    <button id="toggle-flood" style="padding: 12px 25px; background: var(--accent-jade); border: none; border-radius: 8px; cursor: pointer; color: black; font-weight: bold; font-size: 1rem; transition: transform 0.2s;">Toggle Monsoon Flood</button>
+                    <div class="garden-demo">
+                        <div class="garden-water" id="garden-water"></div>
+                        <div class="raft" id="garden-raft"><span style="display:block; text-align:center; font-size:13px; line-height:25px; color:black; font-weight:600;">Agriculture Continues</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-panel" style="margin-top: 40px; text-align: center;">
+                <p>Other profound examples include ancient <strong>Qanat irrigation systems</strong> in the Middle East for extreme drought management, <strong>village-level river monitoring</strong> utilizing visual landmarks in rural China, and the preservation of <strong>Mangrove forests</strong> across Southeast Asia acting as critical bio-shields against tsunamis and storm surges.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4 -->
+    <section id="section-4">
+        <div class="container reveal">
+            <h2 style="font-size: 8rem; opacity: 0.1; position: absolute; top: -20px; left: -20px; z-index: -1;">04</h2>
+            <h2>Chinese Case Study: Water & Community Resilience</h2>
+            <div class="text-columns">
+                <div>
+                    <p>It is crucial to clarify a distinction: the Dragon Boat Festival itself is <em>not</em> a literal disaster-management technology. A boat race will not stop a flood.</p>
+                    <br>
+                    <p>Instead, the festival serves as a profound cultural analogy and a deeply embedded social mechanism. It demonstrates how traditional practices actively preserve <strong>community knowledge, reinforce social capital, and mandate collective participation</strong>. Research by disaster sociologists indicates that communities with dense social networks and shared cultural rituals recover significantly faster from disasters, a concept often mapped using <a href="https://www.census.gov/topics/preparedness.html" target="_blank">demographic and preparedness census data</a>.</p>
+                </div>
+                <div>
+                    <p>During extreme events, formal emergency services are often overwhelmed. The immediate response relies heavily on the local community's ability to self-organize, communicate effectively under stress, and pool resources.</p>
+                    <br>
+                    <p>The synchronization required in a dragon boat—where twenty individuals must paddle in absolute unison, guided only by the rhythm of a single drum, while navigating turbulent waters—is the exact same psychological and social skill set required to mount a coordinated community response to a natural hazard.</p>
+                </div>
+            </div>
+            
+            <div class="compare-panel">
+                <div class="compare-box">
+                    <div class="team-icon" id="rowing-anim">🚣🚣🚣</div>
+                    <h3 style="color:var(--accent-jade)">Dragon Boat Teamwork</h3>
+                    <p style="font-size: 1rem; color:#ccc;">Requires intense physical synchronization, immediate adherence to clear communication from the drummer, mutual trust, and a collective, unified effort to navigate the river's dynamic currents.</p>
+                </div>
+                <div class="compare-box">
+                    <div class="team-icon">🤝⛑️📦</div>
+                    <h3 style="color:var(--accent-gold)">Disaster Response Teamwork</h3>
+                    <p style="font-size: 1rem; color:#ccc;">Requires rapid, coordinated resource allocation, clear community communication hierarchies, mutual trust among neighbors, and a collective effort to triage and recover from catastrophic hazards.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5 -->
+    <section id="section-5">
+        <div class="container reveal">
+            <h2 style="font-size: 8rem; opacity: 0.1; position: absolute; top: -20px; left: -20px; z-index: -1;">05</h2>
+            <h2>Lessons for Disaster Risk Reduction (DRR)</h2>
+            <p>To integrate these concepts into modern, actionable frameworks, we must distill the cultural practices into core principles. Click the hexagonal nodes below to explore the fundamental pillars of traditional disaster management that can be directly applied to contemporary urban planning and emergency management.</p>
+            
+            <div class="hex-container" id="hex-grid">
+                <div class="hex" data-desc="<strong>Local Environmental Knowledge:</strong> Indigenous communities possess granular, generational data regarding the specific hazards, micro-climates, and historical environmental patterns of their region—data often invisible to broad satellite tracking or short-term modern meteorological studies.">Local Env Knowledge</div>
+                <div class="hex" data-desc="<strong>Early Warning Systems:</strong> Long before modern sirens, oral traditions, observation of animal behavior (e.g., birds migrating unusually, insects relocating), and interpreting subtle shifts in cloud formations or river sediment provided highly localized, actionable early warnings.">Early Warning</div>
+                <div class="hex" data-desc="<strong>Adaptive Infrastructure:</strong> Relying on localized materials and historical trial-and-error, traditional buildings and settlements are often uniquely designed to withstand local hazards. This includes stilt houses for floods, flexible timber joints for earthquakes, and sloped roofs for extreme snowfall.">Adaptive Infrastructure</div>
+                <div class="hex" data-desc="<strong>Resource Management:</strong> Ancient populations developed complex, sustainable systems to manage scarcity. Techniques like traditional terracing, qanat irrigation, and rainwater-harvesting systems represent highly adaptive mechanisms tuned to specific local climates and prolonged droughts.">Resource Management</div>
+                <div class="hex" data-desc="<strong>Community Participation:</strong> Traditional knowledge becomes a resilient shield only when it is deeply shared. Festivals, rituals, and communal tasks ensure this knowledge is democratized, fostering mutual aid, lowering panic, and streamlining organization during crises.">Community Participation</div>
+                <div class="hex" data-desc="<strong>Nature-Based Solutions:</strong> Rather than fighting nature with concrete walls, traditional methods often work alongside ecological systems. A prime example is preserving and cultivating mangrove forests along coastlines, which act as highly effective, self-repairing biological buffers against storm surges and coastal erosion.">Nature-Based Solutions</div>
+            </div>
+            <div class="hex-detail" id="hex-display">Select a principle from the wheel to learn more about its application in Disaster Risk Reduction.</div>
+        </div>
+    </section>
+
+    <!-- SECTION 6 -->
+    <section id="section-6">
+        <div class="container reveal">
+            <h2 style="font-size: 8rem; opacity: 0.1; position: absolute; top: -20px; left: -20px; z-index: -1;">06</h2>
+            <h2>Conclusion</h2>
+            <div class="text-columns">
+                <div>
+                    <p>The Dragon Boat Festival provides us with a profound Chinese cultural lens through which to view the mechanisms of traditional knowledge. It highlights the indispensable connection between water literacy, community participation, and cultural continuity.</p>
+                    <br>
+                    <p>The ultimate goal is not to romanticize the past or discard modern engineering. Instead, the most effective, resilient disaster-management strategies of the future will be hybrid models. By combining the hyper-local, historically deep traditional knowledge with the vast predictive power of <strong>modern science and technology</strong>, we can create systems that are not only structurally sound, but socially and culturally appropriate for the communities they serve.</p>
+                </div>
+                <div>
+                    <div class="info-panel">
+                        <h4 style="color:var(--accent-jade)">The Resilience Pathway</h4>
+                        <p>When analyzing these systems, a clear, replicable pathway emerges. It begins with raw knowledge and translates into tangible community resilience through a series of actionable steps, as visualized below.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flow-chain" id="flow-diagram">
+                <div class="flow-item">Traditional Knowledge</div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-item">Understanding Local Env</div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-item">Community Participation</div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-item">Adaptation & Preparedness</div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-item">Disaster Risk Reduction</div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-item" style="border-color:var(--accent-jade); background:rgba(0,191,165,0.2); box-shadow: 0 0 15px rgba(0,191,165,0.3);">Community Resilience</div>
+            </div>
+            
+            <div style="margin-top: 80px; text-align: center; opacity: 0;" id="thank-you">
+                <h1 style="color: var(--accent-gold); font-size: 5rem; letter-spacing: 2px;">Thank You</h1>
+                <div style="font-size: 5rem; margin-top: 10px;">🛶 🌊 🌅</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Intro Animation
+        const titleWords = document.querySelectorAll('.intro-title span');
+        titleWords.forEach(word => {
+            let chars = word.innerText.split('');
+            word.innerHTML = '';
+            chars.forEach(char => {
+                let span = document.createElement('span');
+                span.className = 'char';
+                span.innerText = char;
+                word.appendChild(span);
+            });
+        });
+
+        const tl = gsap.timeline();
+        
+        tl.from('.char', {
+            duration: 1.2,
+            opacity: 0,
+            scale: 0,
+            y: () => (Math.random() - 0.5) * 200,
+            x: () => (Math.random() - 0.5) * 200,
+            stagger: 0.04,
+            ease: "back.out(1.7)"
+        })
+        .to('.intro-subtitle', { opacity: 1, duration: 1, y: -10 }, "-=0.5")
+        .to('.dragon-boat-icon', { opacity: 1, x: '100vw', duration: 4.5, ease: "power1.inOut" }, "-=1")
+        .to('.scroll-indicator', { opacity: 1, duration: 1 });
+
+        // Scroll Progress Bar
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progress-bar").style.width = scrolled + "%";
+            
+            // Nav Dot Update
+            let sections = document.querySelectorAll("section");
+            let dots = document.querySelectorAll(".nav-dot");
+            sections.forEach((sec, index) => {
+                let top = window.scrollY;
+                let offset = sec.offsetTop - 200;
+                let height = sec.offsetHeight;
+                if(top >= offset && top < offset + height) {
+                    dots.forEach(d => d.classList.remove("active"));
+                    dots[index].classList.add("active");
+                }
+            });
+        };
+
+        // Scroll Reveal
+        gsap.utils.toArray('.reveal').forEach(elem => {
+            gsap.to(elem, {
+                scrollTrigger: {
+                    trigger: elem,
+                    start: "top 75%",
+                    toggleClass: "active"
+                },
+                opacity: 1,
+                y: 0,
+                duration: 1.2,
+                ease: "power2.out"
+            });
+        });
+
+        // Interactive Simulations
+        const floodSlider = document.getElementById('flood-slider');
+        const stiltWater = document.getElementById('stilt-water');
+        const floodedAlert = document.getElementById('flooded-alert');
+        
+        floodSlider.addEventListener('input', (e) => {
+            let val = e.target.value;
+            stiltWater.style.height = val + "px";
+            if(val > 50) {
+                floodedAlert.style.opacity = 1;
+            } else {
+                floodedAlert.style.opacity = 0;
+            }
+        });
+
+        const toggleFloodBtn = document.getElementById('toggle-flood');
+        const gardenWater = document.getElementById('garden-water');
+        const gardenRaft = document.getElementById('garden-raft');
+        let isFlooded = false;
+        
+        toggleFloodBtn.addEventListener('click', () => {
+            isFlooded = !isFlooded;
+            if(isFlooded) {
+                gardenWater.style.height = "90px";
+                gardenRaft.style.bottom = "90px";
+                toggleFloodBtn.innerText = "Drain Floodwater";
+            } else {
+                gardenWater.style.height = "30px";
+                gardenRaft.style.bottom = "30px";
+                toggleFloodBtn.innerText = "Toggle Monsoon Flood";
+            }
+        });
+
+        // Hexagon Interactivity
+        const hexes = document.querySelectorAll('.hex');
+        const hexDisplay = document.getElementById('hex-display');
+        
+        hexes.forEach(hex => {
+            hex.addEventListener('click', () => {
+                hexes.forEach(h => h.classList.remove('active'));
+                hex.classList.add('active');
+                hexDisplay.style.display = 'block';
+                hexDisplay.innerHTML = hex.getAttribute('data-desc');
+                gsap.fromTo(hexDisplay, {opacity: 0, y: -10}, {opacity: 1, y: 0, duration: 0.4});
+            });
+        });
+
+        // Conclusion Flow Animation
+        ScrollTrigger.create({
+            trigger: "#section-6",
+            start: "top 50%",
+            onEnter: () => {
+                gsap.to('.flow-item, .flow-arrow', {
+                    opacity: 1,
+                    x: 0,
+                    stagger: 0.15,
+                    duration: 0.8,
+                    ease: "back.out(1.2)"
+                });
+                gsap.to('#thank-you', {
+                    opacity: 1,
+                    y: -20,
+                    delay: 2.0,
+                    duration: 1.5
+                });
+            }
+        });
+
+        // Nav Dot Clicking
+        document.querySelectorAll('.nav-dot').forEach(dot => {
+            dot.addEventListener('click', (e) => {
+                let target = e.target.getAttribute('data-target');
+                document.querySelector(target).scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Rowing Anim
+        gsap.to('#rowing-anim', {
+            x: 25,
+            yoyo: true,
+            repeat: -1,
+            duration: 0.7,
+            ease: "sine.inOut"
+        });
+
+    </script>
+</body>
+</html>
